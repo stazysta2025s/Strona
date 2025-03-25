@@ -1,17 +1,51 @@
 <!DOCTYPE html>
 <html lang="pl">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monitorowanie Wejść</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Logowanie Wejść</title>
 </head>
-
 <body>
-    <h1>Witaj na stronie monitorującej wejścia</h1>
-    <p>Twoje dane zostały zapisane.</p>
+<h1>Rejestrowanie wejść</h1>
+<p>Twoje dane zostały zapisane w przeglądarce.</p>
 
-    <script src="script.js"></script>
+<button onclick="downloadCSV()">📥 Pobierz logi (CSV)</button>
+
+<script>
+function getOS() {
+let platform = window.navigator.platform;
+if (/Win/i.test(platform)) return "Windows";
+if (/Mac/i.test(platform)) return "MacOS";
+if (/Linux/i.test(platform)) return "Linux";
+if (/Android/i.test(navigator.userAgent)) return "Android";
+if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) return "iOS";
+return "Nieznany";
+}
+
+function saveVisit() {
+let visits = JSON.parse(localStorage.getItem("visits")) || [];
+let entry = {
+ip: "Brak serwera",
+os: getOS(),
+time: new Date().toLocaleString()
+};
+visits.push(entry);
+localStorage.setItem("visits", JSON.stringify(visits));
+}
+
+function downloadCSV() {
+let visits = JSON.parse(localStorage.getItem("visits")) || [];
+let csvContent = "data:text/csv;charset=utf-8,IP,OS,Czas\n" +
+visits.map(v => `${v.ip},${v.os},${v.time}`).join("\n");
+let encodedUri = encodeURI(csvContent);
+let link = document.createElement("a");
+link.setAttribute("href", encodedUri);
+link.setAttribute("download", "logi.csv");
+document.body.appendChild(link);
+link.click();
+}
+
+saveVisit();
+</script>
 </body>
-
 </html>
