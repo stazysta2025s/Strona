@@ -3,13 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Logowanie Wejść</title>
+<title>Zapisywanie Wejść</title>
 </head>
 <body>
 <h1>Rejestrowanie wejść</h1>
 <p>Twoje dane zostały zapisane w przeglądarce.</p>
 
-<button onclick="downloadCSV()">📥 Pobierz logi (CSV)</button>
+<h2>Historia wejść:</h2>
+<ul id="logs"></ul>
 
 <script>
 function getOS() {
@@ -22,30 +23,34 @@ if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) return "iOS";
 return "Nieznany";
 }
 
-function saveVisit() {
+function saveVisit(ip) {
 let visits = JSON.parse(localStorage.getItem("visits")) || [];
 let entry = {
-ip: "Brak serwera",
+ip: ip,
 os: getOS(),
 time: new Date().toLocaleString()
 };
 visits.push(entry);
 localStorage.setItem("visits", JSON.stringify(visits));
+displayVisits();
 }
 
-function downloadCSV() {
+function displayVisits() {
 let visits = JSON.parse(localStorage.getItem("visits")) || [];
-let csvContent = "data:text/csv;charset=utf-8,IP,OS,Czas\n" +
-visits.map(v => `${v.ip},${v.os},${v.time}`).join("\n");
-let encodedUri = encodeURI(csvContent);
-let link = document.createElement("a");
-link.setAttribute("href", encodedUri);
-link.setAttribute("download", "logi.csv");
-document.body.appendChild(link);
-link.click();
+let logs = document.getElementById("logs");
+logs.innerHTML = visits.map(v => `<li>${v.time} - ${v.os} (IP: ${v.ip})</li>`).join("");
 }
 
-saveVisit();
+// Pobranie IP użytkownika z API i zapisanie wizyty
+fetch('https://api64.ipify.org?format=json')
+.then(response => response.json())
+.then(data => saveVisit(data.ip))
+.catch(error => {
+console.error("Błąd pobierania IP:", error);
+saveVisit("Nieznane IP");
+});
+
+displayVisits();
 </script>
 </body>
 </html>
