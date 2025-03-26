@@ -12,45 +12,7 @@
 <h2>Historia wejść:</h2>
 <ul id="logs"></ul>
 
-<script>
-function getOS() {
-let platform = window.navigator.platform;
-if (/Win/i.test(platform)) return "Windows";
-if (/Mac/i.test(platform)) return "MacOS";
-if (/Linux/i.test(platform)) return "Linux";
-if (/Android/i.test(navigator.userAgent)) return "Android";
-if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) return "iOS";
-return "Nieznany";
-}
+<script src="script.js"></script>
 
-function saveVisit(ip) {
-let visits = JSON.parse(localStorage.getItem("visits")) || [];
-let entry = {
-ip: ip,
-os: getOS(),
-time: new Date().toLocaleString()
-};
-visits.push(entry);
-localStorage.setItem("visits", JSON.stringify(visits));
-displayVisits();
-}
-
-function displayVisits() {
-let visits = JSON.parse(localStorage.getItem("visits")) || [];
-let logs = document.getElementById("logs");
-logs.innerHTML = visits.map(v => `<li>${v.time} - ${v.os} (IP: ${v.ip})</li>`).join("");
-}
-
-// Pobranie IP użytkownika z API i zapisanie wizyty
-fetch('https://api64.ipify.org?format=json')
-.then(response => response.json())
-.then(data => saveVisit(data.ip))
-.catch(error => {
-console.error("Błąd pobierania IP:", error);
-saveVisit("Nieznane IP");
-});
-
-displayVisits();
-</script>
 </body>
-</html>
+</html> 
